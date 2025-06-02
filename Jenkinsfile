@@ -2,8 +2,7 @@ pipeline {
   agent any
 
   environment {
-    NETLIFY_SITE_ID = 'nfp_xcow5AqY1FuxrADGezqShj8qvXVZsSKndf50' // 🔁 Replace with your actual Site ID from Netlify
-    NETLIFY_AUTH_TOKEN = credentials('NETLIFY_TOKEN') // 🔐 Stored in Jenkins > Credentials
+    NETLIFY_SITE_ID = 'nfp_xcow5AqY1FuxrADGezqShj8qvXVZsSKndf50'
   }
 
   stages {
@@ -27,11 +26,13 @@ pipeline {
 
     stage('Deploy to Netlify') {
       steps {
-        bat '''
-          set PATH=%APPDATA%\\npm;%PATH%
-          npm install -g netlify-cli
-          netlify deploy --dir=dist --site=%NETLIFY_SITE_ID% --auth=%NETLIFY_AUTH_TOKEN% --prod
-        '''
+        withCredentials([string(credentialsId: 'NETLIFY_TOKEN', variable: 'TOKEN')]) {
+          bat """
+            set PATH=%APPDATA%\\npm;%PATH%
+            npm install -g netlify-cli
+            netlify deploy --dir=dist --site=${env.NETLIFY_SITE_ID} --auth=%TOKEN% --prod
+          """
+        }
       }
     }
   }
