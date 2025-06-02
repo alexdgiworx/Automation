@@ -2,11 +2,11 @@ pipeline {
   agent any
 
   environment {
-    NETLIFY_SITE_ID = 'nfp_xcow5AqY1FuxrADGezqShj8qvXVZsSKndf50'
+    NETLIFY_SITE_ID = 'nfp_xcow5AqY1FuxrADGezqShj8qvXVZsSKndf50' // Paste from Netlify Site Settings
   }
 
   stages {
-    stage('Clone Repo') {
+    stage('Checkout Latest Code') {
       steps {
         git url: 'https://github.com/alexdgiworx/Automation.git', branch: 'main'
       }
@@ -27,11 +27,10 @@ pipeline {
     stage('Deploy to Netlify') {
       steps {
         withCredentials([string(credentialsId: 'NETLIFY_TOKEN', variable: 'TOKEN')]) {
-          bat """
+          bat '''
             set PATH=%APPDATA%\\npm;%PATH%
-            npm install -g netlify-cli
-            netlify deploy --dir=dist --site=${env.NETLIFY_SITE_ID} --auth=%TOKEN% --prod
-          """
+            netlify deploy --dir=dist --site=%NETLIFY_SITE_ID% --auth=%TOKEN% --prod
+          '''
         }
       }
     }
